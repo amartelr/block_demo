@@ -1,1 +1,6 @@
-abstract class Bloc<Event, State> {}
+import 'package:rxdart/rxdart.dart';
+
+
+abstract class Bloc<Event, State> {
+
+}
