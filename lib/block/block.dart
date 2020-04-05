@@ -1,4 +1,6 @@
 import 'package:rxdart/rxdart.dart';
+import 'package:meta/meta.dart';
+
 
 abstract class Bloc<Event, State> {
   final PublishSubject<Event> _eventSubject = PublishSubject<Event>();
@@ -12,8 +14,9 @@ abstract class Bloc<Event, State> {
     _stateSubject = BehaviorSubject<State>.seeded(initialState);
   }
 
+  @mustCallSuper
   void dispose() {
-    _eventSubject.close();
+    _eventSubject.close();  
     _stateSubject.close();
   }
 
