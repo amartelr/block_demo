@@ -21,17 +21,33 @@ abstract class Bloc<Event, State> {
     _stateSubject.close();
   }
 
+  void onError(Object error, StackTrace stacktrace) => null;
+
   void dispatch(Event event) {
-    _eventSubject.sink.add(event);
+    try {
+      _eventSubject.sink.add(event);
+    } catch (error) {
+      _handleError(error);
+    }
   }
 
   Stream<State> mapEventToState(Event event);
 
   void _bindStateSubject() {
-    _eventSubject.asyncExpand(mapEventToState).forEach(
+    _eventSubject.asyncExpand(
+      (Event event) {
+        return mapEventToState(event).handleError(_handleError);
+      },
+    ).forEach(
       (State nextState) {
+        // Evitar enviar estados iguales o el estado está cerrado
+        if (currentState == nextState || _stateSubject.isClosed) return;
         _stateSubject.sink.add(nextState);
       },
     );
+  }
+
+  void _handleError(Object error, [StackTrace stacktrace]) {
+    onError(error, stacktrace);
   }
 }
